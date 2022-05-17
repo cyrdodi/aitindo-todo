@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Todo;
+use App\Models\Task;
 use Illuminate\Http\Request;
 
 class TodoController extends Controller
 {
   public function index()
   {
+    $tasks = Task::orderBy('created_at', 'desc')->get();
+
     return view(
       'home',
       [
-        'tasks' => Todo::orderBy('status', 'desc')->get(),
+        'tasks' => $tasks,
       ]
     );
   }
@@ -20,26 +22,24 @@ class TodoController extends Controller
   public function store()
   {
     $attributes = request()->validate([
-      'task' => 'required'
+      'name' => 'required'
     ]);
 
-    Todo::create($attributes);
+    Task::create($attributes);
 
     return redirect()->back();
   }
 
-  public function destroy(Todo $todo)
+  public function destroy(Task $task)
   {
-    $todo->delete();
+    $task->delete();
 
     return redirect()->back();
   }
 
-  public function update(Todo $todo)
+  public function update(Task $task)
   {
-    // update the status of the task to 0
-
-    $todo->update(['status' => '0']);
+    $task->update(['complete' => !$task->complete]);
 
     return redirect()->back();
   }
